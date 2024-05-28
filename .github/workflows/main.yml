@@ -1,0 +1,22 @@
+name: Docker Run
+ 
+on: workflow_dispatch
+  #push:
+    #branches: development
+jobs:
+  build:
+ 
+    runs-on: ubuntu-latest
+ 
+    steps:
+    - name: Docker Version
+      run: docker -v
+ 
+    - name: Checkout
+      uses: actions/checkout@v3
+ 
+    - name: Dir
+      run: ls
+ 
+    - name: Docker Build
+      run: docker build . -t 1.0
