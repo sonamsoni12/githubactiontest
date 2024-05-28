@@ -1,0 +1,30 @@
+name: Build and Push Docker Image
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow on push to the main branch
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: docker/setup-buildx-action@v3
+    - uses: azure/docker-login@v2
+      with:
+        username: ${{ secrets.AZURE_ROLE_USER }}
+        password: ${{ secrets.AZURE_ROLE_PASSWORD }}
+        registry: ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io
+    - run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin 
+    # - name: Build and Push to ACR
+    #   uses: docker/build-push-action@v2
+    #   with:
+    #     push: true
+    #     tags: ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/sampleapp:V2
+    #     file: Dockerfile
+    - run: |
+        docker login -u ${{ secrets.AZURE_ROLE_USER }} -p ${{ secrets.AZURE_ROLE_PASSWORD }} ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io
+        docker build . -t ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/sampleapp:V1
+        docker push ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/sampleapp:V1
+
